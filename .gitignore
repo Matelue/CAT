@@ -2,8 +2,6 @@
 src/
 test_*
 tmp_*
-egs/**/data/
-egs/**/exp/
 egs/**/sentencepiece
 .vscode
 *.tknz
