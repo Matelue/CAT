@@ -2,11 +2,10 @@
 # Acknowlegement: This script refer to the code of Huahuan Zheng (maxwellzh@outlook.com)
 # This script completes text normalization for Russian dataset from CommonVoice
 
-data_dir=$/home/mate/cat_multilingual/egs/cv-lang10/data
-echo "Text Normalization"
+data_dir=$1
     for set in dev test excluded_train; do
-      paste $data_dir/ru/$set/text > $data_dir/ru/$set/text.bak
-      cut <$data_dir/ru/$set/text.bak -f 2- | \
+      paste $data_dir/$set/text > $data_dir/$set/text.bak
+      cut <$data_dir/$set/text.bak -f 2- | \
         sed -e 's/[.]/ /g; s/!/ /g; s/?/ /g; s/—/ /g; s/»/ /g; s/«/ /g' \
                 -e 's/“/ /g; s/"/ /g; s/,/ /g; s/”/ /g; s/=/ /g; s/،/ /g; s/؛/ /g; s/٬/ /g' \
                 -e "s/’/ /g; s/‘/ /g; s/\।/ /g; s/॥/ /g; s/„/ /g" \
@@ -14,10 +13,10 @@ echo "Text Normalization"
                 -e 's/[\]/ /g; s/[_]/ /g; s/–/ /g; s/−/ /g; s/…/ /g; s/ -/ /g; s/- / /g' \
                 -e 's/⅛/ /g' | \
          sed -e 's/[ ][ ]*/ /g; s/^[ ]*//g; s/[ ]*$//g' | \
-         python -c "import sys; print(sys.stdin.read().lower())" > $data_dir/ru/$set/text.trans.tmp
-      cut <$data_dir/ru/$set/text.bak -f 1 > $data_dir/ru/$set/text.id.tmp
-      paste $data_dir/ru/$set/text.{id,trans}.tmp > $data_dir/ru/$set/text
-      cat $data_dir/ru/$set/text | sed -e 's/^[	]*//g' | grep -v "^$" > $data_dir/ru/$set/text_new
-      mv $data_dir/ru/$set/text_new $data_dir/ru/$set/text
-      rm -rf $data_dir/ru/$set/text.{id,trans}.tmp
+         python -c "import sys; print(sys.stdin.read().lower())" > $data_dir/$set/text.trans.tmp
+      cut <$data_dir/$set/text.bak -f 1 > $data_dir/$set/text.id.tmp
+      paste $data_dir/$set/text.{id,trans}.tmp > $data_dir/$set/text
+      cat $data_dir/$set/text | sed -e 's/^[	]*//g' | grep -v "^$" > $data_dir/$set/text_new
+      mv $data_dir/$set/text_new $data_dir/$set/text
+      rm -rf $data_dir/$set/text.{id,trans}.tmp
     done

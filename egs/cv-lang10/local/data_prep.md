@@ -1,80 +1,79 @@
 # Data preprocessing
 
-数据处理分为以下几个步骤：
+Follow the 5 steps to process data for a given language：
+* Data Downloading
+* Kaldi Format Data Generation 
+* Excluding dev and test from the training set
+* Text Normalization
+* Word List Generation
+* Pronunciation Lexicon Generation
+* Feature Extraction
 
-下载数据 -> 转换成kaldi格式 -> 文本正则化 -> 生成词典 -> 特征提取
-
-以下，以波兰语为例，详细讲解：
-
-```shell
-lang=pl
-work_space=/mnt/workspace/saier/cat-test/egs/commonvoice
-data_space=$work_space/data
-dict_dir=$work_space/dict/$lang
-data_dir=$data_space/$lang
-wav_dir=$data_space/cv-corpus-11.0-2022-09-21/$lang
-```
-
-## Stage -1: 下载数据
-
-从 [CommonVoice 官网](https://commonvoice.mozilla.org/zh-CN/datasets) 下载数据并解压。
+We will explain in detail for Polish as below:
 
 ```bash
-wget -c https://mozilla-common-voice-datasets.s3.dualstack.us-west-2.amazonaws.com/cv-corpus-11.0-2022-09-21/cv-corpus-11.0-2022-09-21-${lang}.tar.gz
-tar -xvf cv-corpus-11.0-2022-09-21-${lang}.tar.gz
+export LC_ALL=C.UTF-8
+stage=1
+stop_stage=6
+lang=pl
+download_url="https://storage.googleapis.com/common-voice-prod-prod-datasets/cv-corpus-11.0-2022-09-21/cv-corpus-11.0-2022-09-21-${lang}.tar.gz"  # URL for CommonVoice languages dataset. The URL may change, it is recommended to get the download link on https://commonvoice.mozilla.org/en/datasets
+work_space=CAT/egs/cv-lang10  # your working path
+dict_dir=$work_space/dict/$lang
+data_dir=$work_space/data/$lang
+wav_dir=$work_space/data/cv-corpus-11.0-2022-09-21/$lang
+kaldi_root=/opt/kaldi
 ```
 
-## Stage 0: 生成 kaldi 格式的数据
+## Stage -1: Data Downloading
 
-从解压后的csv文件中提取音频路径和转录文本，生成 kaldi 格式的数据。这里只需要生成 `text` 和 `wav.scp` 两个文件。
+Download data from [CommonVoice official website](https://commonvoice.mozilla.org/zh-CN/datasets) and unzip it
+
+```bash
+wget -c $download_url -O cv-corpus-${lang}.tar.gz
+tar -xvf cv-corpus-${lang}.tar.gz 
+```
+
+## Stage 0: Kaldi Format Data Generation 
+
+Extract audio paths and transcription texts from the unzipped csv files to generate Kaldi format data. Only `text` and `wav.scp` files need to be generated.
 
 ```bash
 cd $work_space
-mkdir -p data/$lang
+mkdir -p $data_dir
 for s in dev test train validated;do
-    cd $work_space
-    mkdir -p $data_dir
-    file="$src/cv-corpus-11.0-2022-09-21/$lang/$s.tsv"
-    [ ! -f $file ] && {
-    echo "No such file $file"
-    exit 1
-    }
-    # 打开file文件，去除句子后缀，只保留句子ID，临时保存为uid.tmp
+    d_set="$data_dir/$s"
+    mkdir -p $d_set
+    file="$wav_dir/$s.tsv"
+          [ ! -f $file ] && {
+              echo "No such file $file"
+              exit 1
+          }
     cut <$file -f 2 | tail -n +2 | xargs basename -s ".mp3" >$d_set/uid.tmp
-    # 将句子路径输出为path.tmp
-    cut <$file -f 2 | tail -n +2 | awk -v path="$wav_dir/cv-corpus-11.0-2022-09-21/$lang/clips" '{print path"/"$1}' >$d_set/path.tmp
-    # 将句子ID与对应路径拼接到同一文件并输出到wav.scp
+    cut <$file -f 2 | tail -n +2 | awk -v path="$wav_dir/clips" '{print path"/"$1}' >$d_set/path.tmp
     paste $d_set/{uid,path}.tmp | sort -k 1,1 -u >$d_set/wav.scp
-    # 将句子路径输出为text.tmp
     cut <$file -f 3 | tail -n +2 >$d_set/text.tmp
-    # 将句子ID与对应文本拼接到同一文件并输出到text
     paste $d_set/{uid,text}.tmp | sort -k 1,1 -u >$d_set/text
-    # 删除临时文件
     rm -rf $d_set/{uid,text,path}.tmp
 done
 ```
 
-代码中的变量`language_list`为所要处理的语言的ID列表，`d_set`为处理后的数据存放路径，`file`为原始转录文本路径；该阶段主要实现根据音频数据及路径生成`text`和`wav.scp`。
-`text` 中的数据格式如下所示:
+The variable `language_list` in the code is the list of language IDs to be processed, `d_set` is the path where the processed data is stored, and `file` is the path of the original transcription text; This stage mainly realizes the generation of `text` and `wav.scp` based on audio data and paths.
 
+The data format in `text `is as follows:
 ```
 $ head -2 data/pl/dev/text
 common_voice_pl_100540	same way you did
 common_voice_pl_10091129	by hook or by crook
 ```
 
-`wav.scp` 中的数据格式如下所示:
-
+The data format in `wav.scp` is as follows:
 ```
 $ head -2 data/pl/dev/text
 common_voice_pl_20551620	/mnt/workspace/CAT/egs/commonvoice/data/cv-corpus-11.0-2022-09-21/pl/clips/common_voice_pl_20551620.mp3
 common_voice_pl_20594755	/mnt/workspace/CAT/egs/commonvoice/data/cv-corpus-11.0-2022-09-21/pl/clips/common_voice_pl_20594755.mp3
 ```
 
-## Stage 1: 从训练集中去除测试集和验证集
-
-代码如下：
-
+## Stage 1: Excluding dev and test from the training set
 ```bash
 if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
   # By default, I use validated+train as the real training data
@@ -98,10 +97,9 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
   echo $lang 'Text done'
 fi
 ```
-## Stage 2: 文本正则化
+## Stage 2: Text normalization
 
-去除转录文本`text`中的特殊符号如标点符号、外来语字符，因为非语言符号无法被G2P模型识别以生成词典。
-
+Remove special characters such as punctuation marks and foreign language characters from the transcription `text`, as non-linguistic symbols cannot be recognized by the G2P model to generate a pronunciation lexicon.
 ```bash
 if [ ${stage} -le 2 ] && [ ${stop_stage} -ge 2 ];then
   echo "stage 2: Text Normalization"
@@ -127,16 +125,18 @@ if [ ${stage} -le 2 ] && [ ${stop_stage} -ge 2 ];then
   echo $lang 'Text normalization done'
 fi
 ```
-每个语言的文本中的特殊符号不一样，因此需要先根据文本打印出所有字符，将字符集输入给G2P模型，统计不能识别的字符，再调用`text_norm.sh`进行去除。
-注：
-    （1）对于非语言符号，在脚本中添加待删字符即可使用脚本去除；注意有些字符如`$`、`\`等需在该符号前面加转义字符`\`，否则命令无法被正确执行。
-    （2）对于外来语字符，由于其具有发音信息，只删除某个词可能会影响模型训练，因此需直接删除包含外来语的整条句子。
-    （3）为避免误删，删除前建议对`text`和`wav.scp`进行备份，所有正则化操作只对`text`进行。
 
-## Stage 3: 词表生成
+Each language’s text contains different special symbols. Therefore, it is necessary to print out all the characters from the text, then we input the characters into the G2P model and count the unrecognized characters. And run `text_norm.sh` to remove them.
 
-统计转录文本中的词，生成唯一的词表，一个词为一行，格式如下所示:
+Note:
 
+* For non-linguistic symbols, we add the characters to be removed in the script and use the script to remove them. Note that some characters like `$`, `\`, etc., which need to be preceded by an escape character `\`, otherwise the command cannot be executed correctly.
+* For foreign characters, since they contain pronunciation information, simply deleting a word may affect model training. Therefore, it is necessary to delete the entire sentence containing foreign characters.
+* To avoid accidental deletion, it is recommended to back up `text` and `wav.scp` before deletion. All normalization operations should only be performed on `text`.
+
+## Stage 3: Word List Generation
+
+Count the words in the transcription text and generate a unique word list, with one word per line, formatted as follows:
 ```
 $ head -3 $dict_dir/word_list
 a
@@ -144,7 +144,6 @@ aaron
 ababa
 ```
 
-代码如下：
 ```bash
 if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ];then
 	mkdir -p $dict_dir
@@ -155,12 +154,11 @@ if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ];then
   	echo $lang 'character list done, please check special tokens in character list, confirm Text normalization is correct.'
 fi
 ```
-其中file为转录文本的路径，注意检查是否正确。
+Where `text_file` is the path of the transcription.
 
-## Stage 4: 词典生成
+## Stage 4: Pronunciation Lexicon Generation
 
-使用去除特殊符号后的转录文本作为G2P模型的输入来生成词典，因此需先下载G2P模型，下载网址https://github.com/uiuc-sst/g2ps；生成的词典中每一行为词到音素的一一对应，格式如下所示：
-
+Firstly, it is necessary to download the G2P model from https://github.com/uiuc-sst/g2ps. The we use the transcription text after normalization as the input of the G2P model to generate the pronunciation lexicon. Each line in the generated lexicon is a mapping from word to phoneme, formatted as follows:
 ```
 $ head -3 $dict_dir/lexicon.txt
 a	ə
@@ -168,14 +166,13 @@ aaron	a a r o n
 ababa	a b ə b ə
 ```
 
-代码如下：
 ```bash
 if [ ${stage} -le 4 ] && [ ${stop_stage} -ge 4 ];then
   # Generating lexicon and lexicon correction
   echo "stage 4: G2P Conversion, generating lexicon"
-  # 生成词典
-  bash data/$lang/lexicon.sh
-  # 去除词典中的特殊符号
+  g2ps=g2ps/models 
+  phonetisaurus-apply --model $g2ps/polish_2_2_2.fst --word_list dict/pl_mls/word_list > dict/pl_mls/lexicon.txt
+  cat dict/pl_mls/lexicon.txt | awk '{$1=""; print $0}' | sed -e 's/ts/t͡s/g; s/dz/d͡z/g; s/ɖʐ/ɖ͡ʐ/g; s/tʂ/ʈ͡ʂ/g; s/dʑ/d͡ʑ/g; s/tɕ/t͡ɕ/g; s/ɔ̃/ɔ/g; s/ɨ̃/ɨ/g; s/ɛ̃/ɛ/g; s/w̃/w/g; s/ɛ̝/ɛ/g; s/s̪/s/g; s/n̪/n/g; s/t̪/t/g; s/z̪/z/g' > dict/pl_mls/phone.txt
   sed -i 's/ː//g; s/ˈ//g; s/ʲ//g; s/[ ][ ]*/ /g; s/^[ ]*//g; s/[ ]*$//g' dict/$lang/phone.txt
   cat dict/$lang/lexicon.txt | awk '{print $1}' > dict/$lang/word.txt
   paste dict/$lang/{word,phone}.txt > dict/$lang/lexicon_new.txt
@@ -184,5 +181,45 @@ if [ ${stage} -le 4 ] && [ ${stop_stage} -ge 4 ];then
   echo $lang 'Lexicon done'
 fi
 ```
-由于所使用的G2P模型有一定错误率，可能会生成错误符号，因此生成词典后还需对词典进行后处理，如删除多余符号，拆分双音素为单音素等，具体每个语言的处理需参考http://www.isle.illinois.edu/speech_web_lg/data/g2ps/ 中对应语言的词典。
 
+Since the G2P model used has a certain error rate, it may generate incorrect symbols. Therefore, after generating the lexicon, post-processing is required, such as removing extra symbols and splitting diphonemes into monophoneme. The specific processing for each language needs to refer to the corresponding LanguageNet symbol table in http://www.isle.illinois.edu/speech_web_lg/data/g2ps/.
+
+## Stage 5-6: Feature Extraction
+Extract fbank feature from audio data using kaldi toolkit.
+```bash
+if [ ${stage} -le 5 ] && [ ${stop_stage} -ge 5 ]; then
+    echo "stage 5: Get duration from mp3 file, use kaldi toolkit"
+    for ti in dev test excluded_train;do
+      # generate utt2spk and spk2utt that kaldi needed
+      awk '{print $1,$1}' $data_dir/${ti}/wav.scp > $data_dir/${ti}/utt2spk
+      cp $data_dir/${ti}/utt2spk $data_dir/${ti}/spk2utt
+
+      # add ffmpeg command for wav.scp file
+      mv $data_dir/$ti/wav.scp $data_dir/$ti/wav_mp3.scp
+      awk '{print $1 "\tffmpeg -i " $2 " -f wav -ar 16000 -ab 16 -ac 1 - |"}' $data_dir/$ti/wav_mp3.scp > $data_dir/$ti/wav.scp
+      
+      # Get duration
+      cd $kaldi_root/egs/wsj/s5
+      utils/data/get_utt2dur.sh $data_dir/$ti
+
+      # Get total duration
+      python local/tools/calculate_dur.py $data_dir/$ti
+    done
+fi
+
+if [ ${stage} -le 6 ] && [ ${stop_stage} -ge 6 ]; then
+  echo "stage 6: make F-bank feature, use kaldi toolkit"
+    for ti in dev test excluded_train;do
+      # fix data
+      cd $kaldi_root/egs/wsj/s5
+      utils/fix_data_dir.sh $data_dir/$ti
+
+      mkdir -p $data_dir/$ti/conf
+      echo "--num-mel-bins=80" > $data_dir/$ti/conf/fbank.conf
+      steps/make_fbank.sh --fbank-config $data_dir/$ti/conf \
+                          $data_dir/$ti \
+                          $data_dir/$ti/log \
+                          $data_dir/$ti/fbank
+    done
+fi
+```
