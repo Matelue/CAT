@@ -13,7 +13,7 @@ Beam search decoding and sanmpling are also uesd to generate noisy phonemes for 
 
 
 ## Results
-### WER of LLM-P2G with DANP
+### WER of LLM-P2G with TKM
 
 | TKM strategy | Polish | | German | |
 | ------ | ------ | ------ | ------ | ------ |
