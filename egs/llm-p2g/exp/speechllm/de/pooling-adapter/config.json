@@ -1,0 +1,68 @@
+{
+    "llm_name": "/mnt/nas4_workspace/spmiData/asr/models/mt5-base",
+    "finetune_encoder": false,
+    "audio_encoder_name": "/mnt/workspace/mate/CAT/egs/commonvoice/exp/llm/03_mt5_pooling_de/whistle_ft_de_best-3.pt",
+    "data": {
+        "train": {
+            "scp": "/mnt/nas4_workspace/spmiData/asr/data/de/excluded_train_sub_130h/feats.scp",
+            "trans": "/mnt/nas4_workspace/spmiData/asr/data/de/excluded_train_sub_130h/text",
+            "dur": "/mnt/nas4_workspace/spmiData/asr/data/de/excluded_train_sub_130h/utt2dur"
+        },
+        "dev": {
+            "scp": "/mnt/nas4_workspace/spmiData/asr/data/de/dev/feats.scp",
+            "trans": "/mnt/nas4_workspace/spmiData/asr/data/de/dev/text",
+            "dur": "/mnt/nas4_workspace/spmiData/asr/data/de/dev/utt2dur"
+        },
+        "test": {
+            "scp": "/mnt/nas4_workspace/spmiData/asr/data/de/test/feats.scp",
+            "trans": "/mnt/nas4_workspace/spmiData/asr/data/de/test/text",
+            "dur": "/mnt/nas4_workspace/spmiData/asr/data/de/test/utt2dur"
+        },
+        "filter": "10:2000",
+        "train_pkl": "/mnt/workspace/mate/CAT/egs/commonvoice/exp/llm/03_mt5_pooling_de/pkl/train.pkl",
+        "dev_pkl": "/mnt/workspace/mate/CAT/egs/commonvoice/exp/llm/03_mt5_pooling_de/pkl/dev.pkl",
+        "test_pkl": "/mnt/workspace/mate/CAT/egs/commonvoice/exp/llm/03_mt5_pooling_de/pkl/test.pkl"
+    },
+    "encoder": {
+        "built_model_by": "cat.ctc.train",
+        "tokenizer": "/mnt/nas4_workspace/spmiData/asr/dict/de/tokenizer_phn.tknz",
+        "use_phoneme": false,
+        "use_prompt": false,
+        "type": "ConformerNet",
+        "kwargs": {
+            "num_cells": 14,
+            "idim": 80,
+            "hdim": 512,
+            "conv": "vgg2l",
+            "num_heads": 4,
+            "kernel_size": 15,
+            "num_classes": 47
+        }
+    },
+    "adapter_name": "pooling-adapter",
+    "adapter_conf": {
+        "audio_enc_dim": 512,
+        "llm_dim": 768,
+        "activation": "gelu",
+        "num_layers": 2,
+        "pooling": "avg",
+        "pooling_factor": 2
+    },
+    "use_lora": false,
+    "lora_r": 8,
+    "lora_alpha": 32,
+    "max_lr": 1e-4,
+    "warmup_steps": 5000,
+    "grad_accumulate_steps": 10,
+    "max_epochs": 400,
+    "LLM_type": "mT5",
+    "end_of_test_id": 1,
+    "train_batch_size": 20,
+    "valid_batch_size": 20,
+    "seed": 1234,
+    "exp_dir": "/mnt/workspace/mate/CAT/egs/commonvoice/exp/llm/03_mt5_pooling_de",
+    "exp_name": "03_mt5_pooling_de",
+    "TensorBoard_dir": "/mnt/workspace/mate/CAT/egs/commonvoice/exp/llm/03_mt5_pooling_de/log",
+    "TensorBoard_name": "03_mt5_pooling_de",
+    "resume_from_checkpoint": "/mnt/workspace/mate/CAT/egs/commonvoice/exp/llm/03_mt5_pooling_de/last.ckpt"
+}

@@ -45,7 +45,7 @@ def unpack_param(
     old_num_classes = m_updated["module.encoder.classifier.weight"].size(0)
     new_num_classes = mapping.size(0)
 
-    #mapping中含-1的位置索引
+    
     indices = torch.nonzero(mapping == -1).squeeze()
     if mode == "flatphone":
         m_updated["module.encoder.classifier.weight"] = m_updated[
@@ -54,7 +54,7 @@ def unpack_param(
         m_updated["module.encoder.classifier.bias"] = m_updated[
             "module.encoder.classifier.bias"
         ][mapping]
-        # 对含-1的(未被mul_dict覆盖的音素)位置的权重和偏置进行随机初始化
+        
         if old_num_classes >= new_num_classes:
             if len(np.array(indices)):
                 sys.stderr.write(f"WARNING: The multilingual dict cannot cover the monolingual dict\n")
@@ -126,7 +126,7 @@ if __name__ == "__main__":
             if u in units_mul:
               matching.append(units_mul[u])
             else:
-              matching.append(-1)  # 对未被覆盖的音素位置，赋值-1
+              matching.append(-1)  
               cnt_uncover += 1
 
         

@@ -1,25 +1,25 @@
 #!bin/bash
-# 从指定数据集中随机提取或去除指定时长的子数据集
+# The script select any hours of subset from training data
 # set -x -u
-language_dir=$1  # 数据路径，如/mnt/workspace/Multilingual-cv/liziwei/cv_v1/pl
-sub_dur=$2  # 需要的子集时长，单位分钟，如10
-mode=0  # mode={0,1} 0表示提取指定时长，1表示去除指定时长
+language_dir=$1  # data path that contains `text`, `wav.scp` and `utt2dur`
+sub_dur=$2  # data hours
+mode=0  # mode={0,1} `0` means selecting any hours ;`1` means excluding ang hours
 input_data_dir=$language_dir/excluded_train  # excluded_train
-utt2dur_file=$language_dir/excluded_train/utt2dur    # utt2dur 文件的路径
+utt2dur_file=$language_dir/excluded_train/utt2dur    # utt2dur 
 
 
-  total_desired_duration=$sub_dur*3600  # sub_dur小时
+  total_desired_duration=$sub_dur*3600  # $sub_dur hours
 
-#   total_desired_duration=$sub_dur*60  # sub_dur分钟
+#   total_desired_duration=$sub_dur*60  # $sub_dur minutes
 
-#   total_desired_duration=$sub_dur  # sub_dur秒
+#   total_desired_duration=$sub_dur  # $sub_dur seconds
 
 output_data_dir=$language_dir/excluded_train_sub_${sub_dur}m   # sub_excluded_train
 mkdir $output_data_dir
-# 从 utt2dur 文件中读取句子ID和时长，并随机排序
+
 awk '{print $1}' "$utt2dur_file" | shuf > $output_data_dir/shuffled_utt_ids.txt
 awk '{print $1}' "$utt2dur_file" | sort > $output_data_dir/sorted_utt_ids.txt
-# 计算需要的总时长
+
 current_total_duration=0
 while read -r utt_id; do
     utt_duration=$(grep -P "^${utt_id} " "$utt2dur_file" | awk '{print $2}')
@@ -34,7 +34,7 @@ rm $output_data_dir/shuffled_utt_ids.txt
 sort $output_data_dir/selected_utt_ids.txt -o $output_data_dir/selected_utt_ids_new.txt
 comm -3 $output_data_dir/selected_utt_ids_new.txt $output_data_dir/sorted_utt_ids.txt > $output_data_dir/unselected_utt_ids.txt
 rm $output_data_dir/sorted_utt_ids.txt
-# 使用 subset_data_dir.sh 创建子集数据
+
 cd /opt/kaldi/egs/wsj/s5
 if [ ${mode} -le 0 ];then
     utils/subset_data_dir.sh --utt-list $output_data_dir/selected_utt_ids.txt $input_data_dir $output_data_dir

@@ -10,7 +10,7 @@ __20 hours of `Indonesian`__ data was used to fine-tune the pretrained __phoneme
 The script [`run.sh`](../../../run.sh) contains the overall model training process.
 
 #### Stage 0: Data preparation
-* The data preparation has been implemented in [`monolingual experiments for Indonesian`](../../../Monolingual/id/readme.md). Run the script [`subset.sh`](../../../../local/tools/subset.sh) to select any hours of data randomly.
+* The data preparation has been implemented in [`monolingual experiments for Indonesian`](../../../Monolingual/id/Mono._phoneme_20h/readme.md). Run the script [`subset.sh`](../../../../local/tools/subset.sh) to select any hours of data randomly.
 * The detailed model parameters are detailed in [`config.json`](config.json) and [`hyper-p.json`](hyper-p.json). Dataset paths should be added to the [`metainfo.json`](../../../data/metainfo.json) for efficient management of datasets.
 
 #### Stage 1 to 3: Model training
@@ -66,4 +66,4 @@ The script [`run.sh`](../../../run.sh) contains the overall model training proce
 
     | Word list | Checkpoint model | Language model | Tensorboard log |
     | ----------- | ----------- | ----------- | ----------- |
-    | [`wordlist_id`](https://cat-ckpt.oss-cn-beijing.aliyuncs.com/cat-multilingual/cv-lang10/dict/id/wordlist_id) | [`Multi._phoneme_ft_subword_id_20h_best-3.pt`](https://cat-ckpt.oss-cn-beijing.aliyuncs.com/cat-multilingual/cv-lang10/exp/id/Multi._phoneme_ft_subword_id_20h_best-3.pt) | [`lm_id.arpa`](https://cat-ckpt.oss-cn-beijing.aliyuncs.com/cat-multilingual/cv-lang10/exp/id/lm_id.arpa) | [`tb_Multi._phoneme_ft_subword_id_20h`](https://cat-ckpt.oss-cn-beijing.aliyuncs.com/cat-multilingual/cv-lang10/exp/id/tb_Multi._phoneme_ft_subword_id_20h) |
+    | [`wordlist_id`](https://cat-ckpt.oss-cn-beijing.aliyuncs.com/cat-multilingual/cv-lang10/dict/id/wordlist_id) | [`Multi._phoneme_ft_subword_20h_best-3.pt`](https://cat-ckpt.oss-cn-beijing.aliyuncs.com/cat-multilingual/cv-lang10/exp/id/Multi._phoneme_ft_subword_20h_best-3.pt) | [`lm_id_4gram.arpa`](https://cat-ckpt.oss-cn-beijing.aliyuncs.com/cat-multilingual/cv-lang10/exp/id/lm_id_4gram.arpa) | [`tb_Multi._phoneme_ft_subword_20h`](https://cat-ckpt.oss-cn-beijing.aliyuncs.com/cat-multilingual/cv-lang10/exp/id/tb_log_Multi._phoneme_ft_subword_20h.tar.gz) |

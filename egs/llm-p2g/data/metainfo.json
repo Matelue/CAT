@@ -1,0 +1,62 @@
+{
+    "train_pl": {
+        "scp": "/mnt/nas4_workspace/spmiData/asr/data/pl/excluded_train/feats.scp",
+        "trans": "/mnt/nas4_workspace/spmiData/asr/data/pl/excluded_train/text"
+    },
+    "dev_pl": {
+        "scp": "/mnt/nas4_workspace/spmiData/asr/data/pl/dev/feats.scp",
+        "trans": "/mnt/nas4_workspace/spmiData/asr/data/pl/dev/text"
+    },
+    "test_pl": {
+        "scp": "/mnt/nas4_workspace/spmiData/asr/data/pl/test/feats.scp",
+        "trans": "/mnt/nas4_workspace/spmiData/asr/data/pl/test/text"
+    },
+    "train_pl_phn_1beam": {
+        "scp": "/mnt/nas4_workspace/spmiData/asr/exp/mul_exp/07_flatpn_mul10_finetune_pl_130h/decode/train_pl/ctc_bs32_best-3",
+        "trans": "/mnt/workspace/saier/CAT/egs/jsa/data/pl/excluded_train/text"
+    },
+    "train_pl_phn_32beam": {
+        "scp": "/mnt/nas4_workspace/spmiData/asr/exp/mul_exp/07_flatpn_mul10_finetune_pl_130h/decode/train_pl/ctc_bs32_best-3_32nbest",
+        "trans": "/mnt/workspace/saier/CAT/egs/jsa/data/pl/excluded_train/text_32nbest"
+    },
+    "train_pl_phn_32sample": {
+        "scp": "/mnt/nas4_workspace/spmiData/asr/exp/mul_exp/07_flatpn_mul10_finetune_pl_130h/decode/train_pl/ctc_bs32_best-3_32sample",
+        "trans": "/mnt/workspace/saier/CAT/egs/jsa/data/pl/excluded_train/text_32sample"
+    },
+    "train_pl_phn_64beam": {
+        "scp": "/mnt/nas4_workspace/spmiData/asr/exp/mul_exp/07_flatpn_mul10_finetune_pl_130h/decode/train_pl/ctc_bs32_best-3_64nbest",
+        "trans": "/mnt/workspace/saier/CAT/egs/jsa/data/pl/excluded_train/text_64nbest"
+    },
+    "train_pl_phn_64sample": {
+        "scp": "/mnt/nas4_workspace/spmiData/asr/exp/mul_exp/07_flatpn_mul10_finetune_pl_130h/decode/train_pl/ctc_bs32_best-3_64sample",
+        "trans": "/mnt/workspace/saier/CAT/egs/jsa/data/pl/excluded_train/text_64sample"
+    },
+    "train_pl_phn_96beam": {
+        "scp": "/mnt/nas4_workspace/spmiData/asr/exp/mul_exp/07_flatpn_mul10_finetune_pl_130h/decode/train_pl/ctc_bs32_best-3_96nbest",
+        "trans": "/mnt/workspace/saier/CAT/egs/jsa/data/pl/excluded_train/text_96nbest"
+    },
+    "train_pl_phn_96sample": {
+        "scp": "/mnt/nas4_workspace/spmiData/asr/exp/mul_exp/07_flatpn_mul10_finetune_pl_130h/decode/train_pl/ctc_bs32_best-3_96sample",
+        "trans": "/mnt/workspace/saier/CAT/egs/jsa/data/pl/excluded_train/text_96sample"
+    },
+    "dev_pl_phn": {
+        "scp": "/mnt/nas4_workspace/spmiData/asr/exp/mul_exp/07_flatpn_mul10_finetune_pl_130h/decode/dev_pl/ctc_bs32_best-3",
+        "trans": "/mnt/workspace/saier/CAT/egs/jsa/data/pl/dev/text"
+    },
+    "test_pl_phn": {
+        "scp": "/mnt/nas4_workspace/spmiData/asr/exp/mul_exp/07_flatpn_mul10_finetune_pl_130h/decode/test_pl/ctc_bs32_best-3",
+        "trans": "/mnt/workspace/saier/CAT/egs/jsa/data/pl/test/text"
+    },
+    "train_de_130h": {
+        "scp": "/mnt/nas4_workspace/spmiData/asr/data/de/excluded_train_sub_130h/feats.scp",
+        "trans": "/mnt/nas4_workspace/spmiData/asr/data/de/excluded_train_sub_130h/text"
+    },
+    "dev_de": {
+        "scp": "/mnt/nas4_workspace/spmiData/asr/data/de/dev/feats.scp",
+        "trans": "/mnt/nas4_workspace/spmiData/asr/data/de/dev/text"
+    },
+    "test_de": {
+        "scp": "/mnt/nas4_workspace/spmiData/asr/data/de/test/feats.scp",
+        "trans": "/mnt/nas4_workspace/spmiData/asr/data/de/test/text"
+    }
+}

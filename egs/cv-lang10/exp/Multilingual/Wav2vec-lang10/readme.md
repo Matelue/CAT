@@ -2,7 +2,7 @@
 Author: Ma, Te (mate153125@gmail.com)
 ### Basic info
 
-This model is trained following the architecture of [wav2vec-base](https://huggingface.co/facebook/wav2vec2-base/tree/main) with the sequence-to-sequence toolkit [fairseq](https://github.com/facebookresearch/fairseq). The training dataset(only audio) consists of __4069 hours of `ten languages`__ speech data sourced from the publicly available [`Common Voice`](https://commonvoice.mozilla.org/) 11.0, which are the same as our proposed multilingual model.
+This model is trained following the architecture of [wav2vec-base](https://huggingface.co/facebook/wav2vec2-base/tree/main) with the sequence-to-sequence toolkit [fairseq](https://github.com/facebookresearch/fairseq). The training dataset(only audio) consists of __4069 hours of `ten languages`__ speech data sourced from the publicly available [`Common Voice`](https://commonvoice.mozilla.org/) 11.0, which are the same as our proposed multilingual model. Run the script [`audio2ark.sh`](../../../../TEMPLATE/local/audio2ark.sh) to prepare training data.
 
 ### Training 
 

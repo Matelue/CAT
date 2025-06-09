@@ -10,7 +10,7 @@ __10 minutes of `Polish`__ data was used to fine-tune the pretrained __subword-b
 The script [`run.sh`](../../../run.sh) contains the overall model training process.
 
 #### Stage 0: Data preparation
-* The data preparation has been implemented in [`monolingual experiments for Polish`](../../../Monolingual/pl/readme.md). Run the script [`subset.sh`](../../../../local/tools/subset.sh) to select any hours of data randomly.
+* The data preparation has been implemented in [`monolingual experiments for Polish`](../../../Monolingual/pl/Mono._phoneme_130h/readme.md). Run the script [`subset.sh`](../../../../local/tools/subset.sh) to select any hours of data randomly.
 * The detailed model parameters are detailed in [`config.json`](config.json) and [`hyper-p.json`](hyper-p.json). Dataset paths should be added to the [`metainfo.json`](../../../data/metainfo.json) for efficient management of datasets.
 
 #### Stage 1 to 3: Model training
@@ -66,4 +66,4 @@ The script [`run.sh`](../../../run.sh) contains the overall model training proce
 
     | Word list | Checkpoint model | Language model | Tensorboard log |
     | ----------- | ----------- | ----------- | ----------- |
-    | [`wordlist_pl`](https://cat-ckpt.oss-cn-beijing.aliyuncs.com/cat-multilingual/cv-lang10/dict/pl/wordlist_pl) | [`Multi._subword_ft_subword_pl_10m_best-3.pt`](https://cat-ckpt.oss-cn-beijing.aliyuncs.com/cat-multilingual/cv-lang10/exp/pl/Multi._subword_ft_subword_pl_10m_best-3.pt) | [`lm_pl.arpa`](https://cat-ckpt.oss-cn-beijing.aliyuncs.com/cat-multilingual/cv-lang10/exp/pl/lm_pl.arpa) | [`tb_Multi._subword_ft_subword_pl_10m`](https://cat-ckpt.oss-cn-beijing.aliyuncs.com/cat-multilingual/cv-lang10/exp/pl/tb_Multi._subword_ft_subword_pl_10m) |
+    | [`wordlist_pl`](https://cat-ckpt.oss-cn-beijing.aliyuncs.com/cat-multilingual/cv-lang10/dict/pl/wordlist_pl) | [`Multi._subword_ft_subword_10m_best-3.pt`](https://cat-ckpt.oss-cn-beijing.aliyuncs.com/cat-multilingual/cv-lang10/exp/pl/Multi._subword_ft_subword_10m_best-3.pt) | [`lm_pl_4gram.arpa`](https://cat-ckpt.oss-cn-beijing.aliyuncs.com/cat-multilingual/cv-lang10/exp/pl/lm_pl_4gram.arpa) | [`tb_Multi._subword_ft_subword_10m`](https://cat-ckpt.oss-cn-beijing.aliyuncs.com/cat-multilingual/cv-lang10/exp/pl/tb_log_Multi._subword_ft_subword_10m.tar.gz) |

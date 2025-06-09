@@ -1,0 +1,60 @@
+{
+    "data": {
+        "train": [
+            "train_pl"
+        ],
+        "dev": [
+            "dev_pl"
+        ],
+        "test": [
+            "test_pl"
+        ],
+        "is_S2P2G": true
+    },
+    "tokenizer": {
+        "type": "LexiconTokenizer",
+        "option-init": {
+            "lexicon": "/mnt/workspace/mate/CAT/egs/commonvoice/dict/pl/lexicon.txt"
+        },
+        "file": "/mnt/workspace1/mate/CAT/egs/commonvoice/data/pl/tokenizer_rmsymb.tknz",
+        "|V|": 37
+    },
+    "input_tokenizer": {
+        "file": "/mnt/workspace1/mate/CAT/egs/commonvoice/data/pl/tokenizer_rmsymb.tknz"
+    },
+    "env": {
+        "CUDA_VISIBLE_DEVICES": "0,1,2,3,4,5,6,7,8,9"
+    },
+    "train": {
+        "bin": "cat.aed.train_mt5_tkm_batch_sample",
+        "option": {
+            "amp": false,
+            "batch_size": 32,
+            "grad_norm": 5.0,
+            "grad_accum_fold": 14,
+            "check_freq": 239,
+            "eval_error_rate": true,
+            "trset": "/mnt/workspace1/mate/CAT/egs/commonvoice/exp/p2g/81_p2g_mt5_FT_pl_noisy_mul-fted_rag_bm32/pkl/train.pkl",
+            "devset": "/mnt/workspace1/mate/CAT/egs/commonvoice/exp/p2g/81_p2g_mt5_FT_pl_noisy_mul-fted_rag_bm32/pkl/dev.pkl",
+            "resume": "exp/p2g/86_p2g_mt5_FT_pl_noisy_mul-fted_rag_sample_T/check/checkpoint.109e27485s.pt"
+        }
+    },
+    "inference": {
+        "avgmodel": {
+            "mode": "last",
+            "num": 3
+        },
+        "infer": {
+            "bin": "cat.aed.decode_mt5_rag_seq",
+            "option": {
+                "beam_size": 1,
+                "batch_size": 4,
+                "gpu": true,
+                "hgf_tokenizer": "/mnt/workspace1/mate/CAT/egs/commonvoice/local/mt5-base",
+                "resume": "/mnt/workspace1/mate/CAT/egs/commonvoice/exp/p2g/104_p2g_mt5_FT_pl_noisy_mul-fted_96bm_ckpts+32sample_wouniq/check/s2p+p2g_pl_best-3.pt"
+            }
+        },
+        "er": {}
+    },
+    "commit": "1b77bc21f7a5faac5e47f6bc4445f23ebf0e0633"
+}

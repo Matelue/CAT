@@ -5,20 +5,23 @@
 
 """Decoder modules impl
 """
+import warnings
 from torchaudio.models.wav2vec2.utils import import_huggingface_model
-from transformers import Wav2Vec2ForCTC
+from transformers import Wav2Vec2ForCTC, AutoTokenizer, LlamaForCausalLM, AutoModelForCausalLM, LlamaConfig
 from . import layer as c_layers
 
 import numpy as np
 from collections import OrderedDict
-from typing import Literal
+from typing import List, Literal, Optional, Tuple
 
 import math
 import torch
 import torch.nn as nn
-
+from torch.distributions.categorical import Categorical
 import transformers
-
+from transformers import modeling_outputs as cls_oput
+from transformers.models.mt5 import modeling_mt5 as mt5
+from transformers.models.mt5 import configuration_mt5 as mt5_cfg
 transformers.logging.set_verbosity_error()
 
 
@@ -577,3 +580,96 @@ class JoinAPNonLinearEncoder(JoinAPLinearEncoder):
     def AP(self) -> torch.Tensor:
         # (Np, Dp) -> (Np, H_ap) -> (Np, H)
         return self.A2(self.sig(self.A1(self.P)))
+
+class TransformerDecoder(AbsEncoder):
+    def __init__(self,
+                 num_layers,
+                 hdim,
+                 num_heads,
+                 intermediate_size,
+                 num_classes,
+                 num_emb,
+                 is_decoder: bool = False,
+                 add_cross_attention: bool = False,
+                 max_position_embeddings: int = 512,
+                 with_head: bool = True):
+        super().__init__(
+            with_head=with_head, num_classes=num_classes, dim_last_hid=hdim
+        )
+
+        self.decoder = c_layers.BertEncoder(num_layers,
+                                            hdim=hdim,
+                                            num_heads=num_heads,
+                                            intermediate_size=intermediate_size,
+                                            is_decoder=is_decoder,
+                                            add_cross_attention=add_cross_attention,
+                                            max_position_embeddings=max_position_embeddings)
+        self.embedding = nn.Embedding(num_emb, hdim)
+        self.dtype = torch.float32
+    
+    def invert_attention_mask(self, encoder_attention_mask: torch.Tensor):
+        """
+        Invert an attention mask (e.g., switches 0. and 1.).
+
+        Args:
+            encoder_attention_mask (`torch.Tensor`): An attention mask.
+
+        Returns:
+            `torch.Tensor`: The inverted attention mask.
+        """
+        if encoder_attention_mask.dim() == 3:
+            encoder_extended_attention_mask = encoder_attention_mask[:, None, :, :]
+        if encoder_attention_mask.dim() == 2:
+            encoder_extended_attention_mask = encoder_attention_mask[:, None, None, :]
+        encoder_extended_attention_mask = (1.0 - encoder_extended_attention_mask) * torch.finfo(self.dtype).min
+        return encoder_extended_attention_mask
+    
+    def generate_attention_mask(self, lens_matrix):
+        seq_len = torch.max(lens_matrix) 
+        attention_mask = torch.arange(seq_len, device=lens_matrix.device)[
+                None, :
+            ] < lens_matrix[:, None].to(lens_matrix.device)
+        return self.invert_attention_mask(attention_mask.to(self.dtype))
+
+    def impl_forward(self, x: torch.Tensor, xlens: torch.Tensor, enc_hidden_state: torch.Tensor = None, enc_hidden_state_lens: torch.Tensor = None):
+        attention_mask = self.generate_attention_mask(xlens)
+        x_em = self.embedding(x)
+        if enc_hidden_state is None:
+            out = self.decoder(x_em, attention_mask)
+        else:
+            enc_attention_mask = self.generate_attention_mask(enc_hidden_state_lens)
+            out = self.decoder(x_em, attention_mask, enc_hidden_state, enc_attention_mask)
+        return out[0], xlens
+
+class MT5FromPretrainedModel(nn.Module):
+    def __init__(
+        self,
+        pretrained_model_name_or_path: str,
+        from_pretrained: bool = True
+    ) -> None:
+        
+        super().__init__()
+
+        # import huggingface model to torch built-in model
+        if from_pretrained:
+            self.config = mt5_cfg.MT5Config.from_pretrained(pretrained_model_name_or_path)
+            self.model = mt5.MT5ForConditionalGeneration.from_pretrained(
+                                            pretrained_model_name_or_path,
+                                            config=self.config
+                                            )
+            # if parallelize:
+            #     self.model.parallelize(self.device_map)
+            self.tokenizer = AutoTokenizer.from_pretrained(
+                                            pretrained_model_name_or_path,
+                                            use_fast=False)
+        else:
+            self.config = mt5_cfg.MT5Config.from_pretrained(pretrained_model_name_or_path)
+            self.model = mt5.MT5ForConditionalGeneration(self.config)
+            self.tokenizer = AutoTokenizer.from_pretrained(
+                                            pretrained_model_name_or_path,
+                                            use_fast=False)
+
+    def forward(self, x: torch.Tensor, y: torch.Tensor, attn_mask: torch.Tensor = None, return_dict: bool = False, return_loss_only: bool = True, loss_reduction: str = "mean", T_weight: float = 1.0):
+        if self.model is not None:
+            model_out = self.model(input_ids=x, labels=y, attention_mask=attn_mask, return_dict=return_dict, return_loss_only=return_loss_only, loss_reduction=loss_reduction, T_weight=T_weight)
+        return model_out

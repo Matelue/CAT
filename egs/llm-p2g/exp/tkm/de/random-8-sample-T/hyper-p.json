@@ -1,0 +1,60 @@
+{
+    "data": {
+        "train": [
+            "train_de_130h"
+        ],
+        "dev": [
+            "dev_de"
+        ],
+        "test": [
+            "test_de"
+        ],
+        "is_S2P2G": true
+    },
+    "tokenizer": {
+        "type": "LexiconTokenizer",
+        "option-init": {
+            "lexicon": "/mnt/workspace/mate/CAT/egs/commonvoice/dict/de/lexicon.txt"
+        },
+        "file": "/mnt/workspace1/mate/CAT/egs/commonvoice/data/de/tokenizer_phn.tknz",
+        "|V|": 47
+    },
+    "input_tokenizer": {
+        "file": "/mnt/workspace1/mate/CAT/egs/commonvoice/data/de/tokenizer_phn.tknz"
+    },
+    "env": {
+        "CUDA_VISIBLE_DEVICES": "0,1,2,3,4,5,6,7,8,9"
+    },
+    "train": {
+        "bin": "cat.aed.train_mt5_tkm_batch_sample",
+        "option": {
+            "amp": false,
+            "batch_size": 30,
+            "grad_norm": 5.0,
+            "grad_accum_fold": 15,
+            "check_freq": 206,
+            "eval_error_rate": true,
+            "trset": "/mnt/workspace1/mate/CAT/egs/commonvoice/exp/p2g/83_p2g_mt5_FT_de_noisy_mul-fted_rag_bm32/pkl/train.pkl",
+            "devset": "/mnt/workspace1/mate/CAT/egs/commonvoice/exp/p2g/83_p2g_mt5_FT_de_noisy_mul-fted_rag_bm32/pkl/dev.pkl"
+        }
+    },
+    "inference": {
+        "avgmodel": {
+            "mode": "best",
+            "num": 3
+        },
+        "infer": {
+            "bin": "cat.aed.decode_mt5_rag_seq",
+            "built_model_by": "cat.aed.train_mt5_tkm_batch_sample",
+            "option": {
+                "beam_size": 1,
+                "batch_size": 16,
+                "gpu": true,
+                "hgf_tokenizer": "/mnt/workspace1/mate/CAT/egs/commonvoice/local/mt5-base",
+                "resume": "/mnt/nas4_workspace/spmiData/asr/exp/p2g_exp/61_p2g_mt5_FT_de_noisy_mul-fted_rag_bm32/check/best-3.pt"
+            }
+        },
+        "er": {}
+    },
+    "commit": "1b77bc21f7a5faac5e47f6bc4445f23ebf0e0633"
+}

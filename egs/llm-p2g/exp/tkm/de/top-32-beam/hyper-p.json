@@ -1,0 +1,57 @@
+{
+    "data": {
+        "train": [
+            "train_de_130h"
+        ],
+        "dev": [
+            "dev_de"
+        ],
+        "test": [
+            "test_de"
+        ],
+        "is_S2P2G": true
+    },
+    "tokenizer": {
+        "type": "LexiconTokenizer",
+        "option-init": {
+            "lexicon": "/mnt/workspace/mate/CAT/egs/commonvoice/dict/de/lexicon.txt"
+        },
+        "file": "/mnt/workspace1/mate/CAT/egs/commonvoice/data/de/tokenizer_phn.tknz",
+        "|V|": 47
+    },
+    "input_tokenizer": {
+        "file": "/mnt/workspace1/mate/CAT/egs/commonvoice/data/de/tokenizer_phn.tknz"
+    },
+    "env": {
+        "CUDA_VISIBLE_DEVICES": "0,1,2,3,4,5,6,7,8,9"
+    },
+    "train": {
+        "bin": "cat.aed.train_mt5_tkm_batch_sample",
+        "option": {
+            "amp": false,
+            "batch_size": 16,
+            "grad_norm": 5.0,
+            "grad_accum_fold": 28,
+            "check_freq": 206,
+            "eval_error_rate": true
+        }
+    },
+    "inference": {
+        "avgmodel": {
+            "mode": "best",
+            "num": 3
+        },
+        "infer": {
+            "bin": "cat.aed.decode_mt5_rag_seq",
+            "built_model_by": "cat.aed.train_mt5_tkm_batch_sample",
+            "option": {
+                "beam_size": 1,
+                "batch_size": 1,
+                "gpu": true,
+                "hgf_tokenizer": "/mnt/workspace1/mate/CAT/egs/commonvoice/local/mt5-base"
+            }
+        },
+        "er": {}
+    },
+    "commit": "1b77bc21f7a5faac5e47f6bc4445f23ebf0e0633"
+}

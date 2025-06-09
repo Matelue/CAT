@@ -1,0 +1,93 @@
+{
+    "data": {
+        "train": [
+            "train_pl_mul-07_sample-25000",
+            "train_pl_phn_mul-07_nbest_0",
+            "train_pl_phn_mul-07_nbest_1",
+            "train_pl_phn_mul-07_nbest_2",
+            "train_pl_phn_mul-07_nbest_3",
+            "train_pl_phn_mul-07_nbest_4",
+            "train_pl_phn_mul-07_nbest_5",
+            "train_pl_phn_mul-07_nbest_6",
+            "train_pl_phn_mul-07_nbest_7",
+            "train_pl_phn_mul-07_nbest_8",
+            "train_pl_phn_mul-07_nbest_9",
+            "train_pl_phn_mul-07_nbest_10",
+            "train_pl_phn_mul-07_nbest_11",
+            "train_pl_phn_mul-07_nbest_12",
+            "train_pl_phn_mul-07_nbest_13",
+            "train_pl_phn_mul-07_nbest_14",
+            "train_pl_phn_mul-07_nbest_15",
+            "train_pl_phn_mul-07_nbest_16",
+            "train_pl_phn_mul-07_nbest_17",
+            "train_pl_phn_mul-07_nbest_18",
+            "train_pl_phn_mul-07_nbest_19",
+            "train_pl_phn_mul-07_nbest_20",
+            "train_pl_phn_mul-07_nbest_21",
+            "train_pl_phn_mul-07_nbest_22",
+            "train_pl_phn_mul-07_nbest_23",
+            "train_pl_phn_mul-07_nbest_24",
+            "train_pl_phn_mul-07_nbest_25",
+            "train_pl_phn_mul-07_nbest_26",
+            "train_pl_phn_mul-07_nbest_27",
+            "train_pl_phn_mul-07_nbest_28",
+            "train_pl_phn_mul-07_nbest_29",
+            "train_pl_phn_mul-07_nbest_30",
+            "train_pl_phn_mul-07_nbest_31"
+
+        ],
+        "dev": [
+            "dev_pl_phn_mul-07"
+        ],
+        "test": [
+            "test_pl_phn_mul-07"
+        ],
+        "is_noisy_data": true,
+        "use_hgf_tknz": true
+    },
+    "tokenizer": {
+        "type": "SentencePieceTokenizer",
+        "option-train": {
+            "model_type": "bpe",
+            "vocab_size": 500,
+            "model_prefix": "/mnt/workspace/liziwei/dict/pl/spm_bpe500"
+        },
+        "|V|": 500,
+        "file": "/mnt/workspace/liziwei/dict/pl/tokenizer_bpe500.tknz"
+    },
+    "input_tokenizer": {
+        "file": "/mnt/workspace/liziwei/dict/pl/tokenizer_rmsymb_100utts_mixed.tknz"
+    },
+    "env": {
+        "CUDA_VISIBLE_DEVICES": "5,6,7,8,9"
+    },
+    "train": {
+        "bin": "cat.aed.train_mt5",
+        "option": {
+            "amp": false,
+            "batch_size": 110,
+            "grad_norm": 5.0,
+            "grad_accum_fold": 4,
+            "check_freq": 1550,
+            "eval_error_rate": true,
+            "hgf_tokenizer": "/mnt/workspace/mate/transformers/models/mt5-base"
+        }
+    },
+    "inference": {
+        "avgmodel": {
+            "mode": "last",
+            "num": 3
+        },
+        "infer": {
+            "bin": "cat.aed.decode_mt5",
+            "option": {
+                "beam_size": 16,
+                "batch_size": 1,
+                "gpu": true,
+                "hgf_tokenizer": "/mnt/workspace/mate/transformers/models/mt5-base"
+            }
+        },
+        "er": {}
+    },
+    "commit": "1b77bc21f7a5faac5e47f6bc4445f23ebf0e0633"
+}

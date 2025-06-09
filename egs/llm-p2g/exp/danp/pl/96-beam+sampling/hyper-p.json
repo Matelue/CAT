@@ -1,0 +1,59 @@
+{
+    "data": {
+        "train": [
+            "train_pl_phn_mul-07_96best",
+            "train_pl_phn_mul-07_32sample"
+        ],
+        "dev": [
+            "dev_pl_phn_mul-07"
+        ],
+        "test": [
+            "test_pl_phn_mul-07"
+        ],
+        "is_noisy_data": true,
+        "use_hgf_tknz": true,
+        "is_P2G": true
+    },
+    "tokenizer": {
+        "type": "LexiconTokenizer",
+        "option-train": {
+            "vocab_size": 37,
+            "model_prefix": "exp/p2g_exp/01_p2g_aed_id_20h_clean/tknz/spm_char"
+        },
+        "|V|": 37,
+        "file": "/mnt/workspace/mate/CAT/egs/commonvoice/dict/pl/tokenizer_rmsymb.tknz"
+    },
+    "input_tokenizer": {
+        "file": "/mnt/workspace/mate/CAT/egs/commonvoice/dict/pl/tokenizer_rmsymb.tknz"
+    },
+    "env": {
+        "CUDA_VISIBLE_DEVICES": "4"
+    },
+    "train": {
+        "bin": "cat.aed.train_mt5",
+        "option": {
+            "amp": false,
+            "batch_size": 88,
+            "grad_norm": 5.0,
+            "grad_accum_fold": 5,
+            "check_freq": 777,
+            "eval_error_rate": true,
+            "hgf_tokenizer": "/mnt/nas4_workspace/spmiData/asr/models/mt5-base",
+            "is_P2G": true
+        }
+    },
+    "inference": {
+        "infer": {
+            "bin": "cat.aed.decode_mt5",
+            "option": {
+                "beam_size": 4,
+                "batch_size": 1,
+                "gpu": true,
+                "hgf_tokenizer": "/mnt/nas4_workspace/spmiData/asr/models/mt5-base",
+                "resume": "/mnt/workspace/mate/CAT/egs/commonvoice/exp/p2g_exp/29_p2g_mt5_FT_pl_noisy_mul-07-fted_64nbest/check/best-3.pt"
+            }
+        },
+        "er": {}
+    },
+    "commit": "1b77bc21f7a5faac5e47f6bc4445f23ebf0e0633"
+}
